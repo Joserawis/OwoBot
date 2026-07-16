@@ -9,7 +9,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle('🎲 Dice Roll')
-            .setDescription(`You rolled a **${roll}**!`)
+            .setDescription(`Kamu roll **${roll}**!`)
             .setTimestamp();
 
         message.channel.send({ embeds: [embed] });

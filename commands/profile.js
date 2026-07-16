@@ -9,7 +9,7 @@ module.exports = {
             const user = await User.findOne({ userId: message.author.id });
 
             if (!user) {
-                return message.channel.send('Your profile does not exist.');
+                return message.channel.send('Profil kamu belum ada, coba pakai bot dulu ya.');
             }
 
             const spouse = user.marriedTo ? `<@${user.marriedTo}>` : 'None';

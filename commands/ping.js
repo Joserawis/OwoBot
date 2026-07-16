@@ -4,6 +4,6 @@ module.exports = {
     description: 'Replies with Pong!',
     execute(message) {
         const latency = Date.now() - message.createdTimestamp;
-        message.channel.send(`🏓 Pong! Latency is ${latency}ms.`);
+        message.channel.send(`🏓 Pong! Latensi bot ${latency}ms.`);
     },
 };

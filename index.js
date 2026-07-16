@@ -8,10 +8,30 @@ const { Client, GatewayIntentBits, Events, Collection, ActivityType } = require(
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 // Set up default prefix and other variables
-const DEFAULT_PREFIX = '?';
+const DEFAULT_PREFIX = 'somuy';
 client.prefix = DEFAULT_PREFIX;
 
 const prefixesPath = path.join(__dirname, 'database/prefixes.json');
+const activeCommandFiles = [
+    'balance',
+    'choose',
+    'coinflip',
+    'define',
+    'duel',
+    'give',
+    'guess',
+    'help',
+    'ping',
+    'prefix',
+    'profile',
+    'roll',
+    'slotbattle',
+    'slots',
+    'translate',
+    'addmoney',
+    'takemoney',
+    'setmoney'
+];
 
 // Load the prefixes from file
 let prefixes = {};
@@ -25,6 +45,9 @@ client.commands = new Collection();
 const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
+    const baseName = path.basename(file, '.js');
+    if (!activeCommandFiles.includes(baseName)) continue;
+
     const commands = require(`./commands/${file}`);
     if (Array.isArray(commands)) {
         for (const command of commands) {
@@ -40,11 +63,9 @@ connectDB();
 client.once(Events.ClientReady, () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
-    // Set streaming status with a URL
-    const serverCount = client.guilds.cache.size; // Number of servers the bot is in
-    client.user.setActivity(`with ${serverCount} servers!`, {
-        type: ActivityType.Streaming,
-        url: 'https://www.twitch.tv/', // Replace with an actual stream URL
+    const serverCount = client.guilds.cache.size;
+    client.user.setActivity(`somuy help • ${serverCount} servers`, {
+        type: ActivityType.Playing,
     });
 });
 
@@ -52,26 +73,31 @@ client.once(Events.ClientReady, () => {
 client.on(Events.MessageCreate, async message => {
     if (message.author.bot) return;
 
-    const guildId = message.guild.id;
-    const prefix = client.prefixes[guildId] || client.prefix;
+    const guildId = message.guild?.id;
+    const prefix = (guildId && client.prefixes[guildId]) || client.prefix;
+    const prefixText = prefix.toLowerCase();
+    const content = message.content.trim();
 
-    if (message.content.startsWith(prefix)) {
-        const args = message.content.slice(prefix.length).trim().split(/ +/);
-        const commandName = args.shift().toLowerCase();
+    if (content.toLowerCase().startsWith(prefixText)) {
+        const args = content.slice(prefix.length).trim().split(/ +/);
+        const commandName = args.shift()?.toLowerCase();
 
-        if (!client.commands.has(commandName)) return;
+        if (!commandName) return;
+        if (!client.commands.has(commandName)) {
+            return message.reply(`Unknown command. Try \`${prefix} help\` for the list.`);
+        }
 
         const command = client.commands.get(commandName);
         try {
             await command.execute(message, args);
         } catch (error) {
             console.error(error);
-            message.reply('There was an error while executing the command.');
+            message.reply(`Something went wrong while running that command. Try \`${prefix} help\` if you need help.`);
         }
     }
 
     if (message.mentions.has(client.user)) {
-        message.reply(`Hello! Here is my prefix: \`${prefix}\``);
+        message.reply(`Halo! Prefix-ku sekarang adalah \`${prefix}\``);
     }
 });
 

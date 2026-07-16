@@ -33,7 +33,7 @@ module.exports = {
             message.channel.send({ embeds: [embed] });
         } catch (error) {
             console.error('Error fetching balance:', error);
-            message.channel.send('An error occurred while fetching your balance.');
+            message.channel.send('Gagal ambil saldo kamu. Coba lagi nanti ya.');
         }
     },
 };
