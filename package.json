@@ -1,5 +1,5 @@
 {
-  "name": "discord-bot",
+  "name": "somuy",
   "version": "1.0.0",
   "description": "A Discord bot with various commands including GIF commands using Giphy API.",
   "main": "index.js",
@@ -19,6 +19,6 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "author": "Z3em",
+  "author": "somuy",
   "license": "ISC"
 }
