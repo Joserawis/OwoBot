@@ -10,13 +10,13 @@ module.exports = {
             : message.client.prefix;
         const embed = new EmbedBuilder()
             .setColor('#00FF00')
-            .setTitle('Somuy Command List')
-            .setDescription(`Halo! Prefix bot ini sekarang \`${prefix}\`.\nCoba command berikut:`)
+            .setTitle('Somuy Bot Commands')
+            .setDescription(`Halo! Prefix bot ini sekarang \`${prefix}\`.\nCoba command berikut agar bot terasa lebih hidup:`)
             .addFields(
-                { name: '💰 Economy', value: '`balance` `coinflip` `slots`', inline: false },
-                { name: '� Games', value: '`guess` `duel` `slotbattle`', inline: false },
-                { name: '�🎲 Fun', value: '`choose` `define` `roll` `translate`', inline: false },
-                { name: '👤 Social', value: '`profile` `ship`', inline: false },
+                { name: '💰 Economy', value: '`balance` `beg` `work` `daily` `bank` `deposit` `withdraw` `give`', inline: false },
+                { name: '🎮 Games', value: '`guess` `duel` `slotbattle` `coinflip` `slots`', inline: false },
+                { name: '🎲 Fun', value: '`choose` `define` `roll` `translate` `ship`', inline: false },
+                { name: '👤 Social', value: '`profile`', inline: false },
                 { name: '⚙️ Owner', value: '`addmoney` `takemoney` `setmoney`', inline: false },
                 { name: '🛠 Utility', value: '`ping` `help` `prefix`', inline: false },
             )

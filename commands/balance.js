@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const User = require('../models/User'); // Load the User schema
+const { getOrCreateUser, saveUser } = require('../utils/userStore');
 
 module.exports = {
     name: 'balance',
@@ -9,25 +9,13 @@ module.exports = {
         const username = message.author.username;
 
         try {
-            // Find user in database or create a new entry
-            let user = await User.findOne({ userId });
+            const user = await getOrCreateUser({ userId, username });
+            await saveUser(user);
 
-            if (!user) {
-                user = new User({
-                    userId: userId,
-                    username: username,
-                    balance: 0,
-                });
-                await user.save(); // Save the new user
-            }
-
-            const balance = user.balance;
-
-            // Create and send embed
             const embed = new EmbedBuilder()
                 .setColor('#00FF00')
                 .setTitle(`${username}'s Balance`)
-                .setDescription(`💰 ${balance}`)
+                .setDescription(`💰 ${user.balance}`)
                 .setTimestamp();
 
             message.channel.send({ embeds: [embed] });

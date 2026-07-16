@@ -1,1 +1,18 @@
-{}
+{
+  "demo-user": {
+    "userId": "demo-user",
+    "username": "Demo",
+    "balance": 0,
+    "bankBalance": 0,
+    "level": 1,
+    "marriedTo": null,
+    "inventory": {
+      "common": [],
+      "rare": []
+    },
+    "zoo": [],
+    "lastDaily": null,
+    "lastWork": null,
+    "lastBeg": null
+  }
+}
