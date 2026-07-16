@@ -14,9 +14,10 @@ module.exports = {
             .setDescription(`Halo! Prefix bot ini sekarang \`${prefix}\`.\nCoba command berikut agar bot terasa lebih hidup:`)
             .addFields(
                 { name: '💰 Economy', value: '`balance` `beg` `work` `daily` `bank` `deposit` `withdraw` `give` `hunt`', inline: false },
-                { name: '🎮 Games', value: '`guess` `duel` `slotbattle` `coinflip` `slots`', inline: false },
+                { name: '🎮 Games', value: '`guess` `duel` `slotbattle` `coinflip` `cf` `slots` `s`', inline: false },
                 { name: '🎲 Fun', value: '`choose` `define` `roll` `translate` `ship`', inline: false },
-                { name: '🧠 Progression', value: '`level` `class` `shop` `leaderboard`', inline: false },
+                { name: '🧠 Progression', value: '`start` `class` `level` `quest` `shop` `leaderboard`', inline: false },
+                { name: '🎒 Inventory', value: '`inventory` `inv`', inline: false },
                 { name: '👤 Social', value: '`profile` `userinfo`', inline: false },
                 { name: '⚙️ Owner', value: '`addmoney` `takemoney` `setmoney`', inline: false },
                 { name: '🛠 Utility', value: '`ping` `help` `prefix`', inline: false },

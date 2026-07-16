@@ -14,7 +14,7 @@ client.prefix = DEFAULT_PREFIX;
 
 const prefixesPath = path.join(__dirname, 'database/prefixes.json');
 const activeCommandFiles = [
-    'balance','beg','daily','work','bank','deposit','withdraw','give','hunt','level','profile','ping','help','prefix','coinflip','slots','slotbattle','guess','duel','choose','define','roll','translate','ship','addmoney','takemoney','setmoney','shop','class','stats','userinfo','leaderboard'
+    'balance','beg','daily','work','bank','deposit','withdraw','give','hunt','level','profile','ping','help','prefix','coinflip','slots','slotbattle','guess','duel','choose','define','roll','translate','ship','addmoney','takemoney','setmoney','shop','class','stats','userinfo','leaderboard','start','quest','inventory','pet','weekly','arena','equipment','guide'
 ];
 
 // Load the prefixes from file
@@ -84,12 +84,26 @@ client.on(Events.MessageCreate, async message => {
         const args = content.slice(prefix.length).trim().split(/ +/);
         const commandName = args.shift()?.toLowerCase();
 
-        if (!commandName) return;
-        if (!client.commands.has(commandName)) {
+        const aliases = {
+            'cf': 'coinflip',
+            'slot': 'slots',
+            's': 'slots',
+            'inv': 'inventory',
+            'q': 'quest',
+            'cls': 'class',
+            'lb': 'leaderboard',
+            'wk': 'weekly',
+            'guide': 'guide'
+        };
+
+        const resolvedCommandName = aliases[commandName] || commandName;
+
+        if (!resolvedCommandName) return;
+        if (!client.commands.has(resolvedCommandName)) {
             return message.reply(`Unknown command. Try \`${prefix} help\` for the list.`);
         }
 
-        const command = client.commands.get(commandName);
+        const command = client.commands.get(resolvedCommandName);
         try {
             await command.execute(message, args);
         } catch (error) {
@@ -99,7 +113,7 @@ client.on(Events.MessageCreate, async message => {
     }
 
     if (message.mentions.has(client.user)) {
-        message.reply(`Halo! Prefix-ku sekarang adalah \`${prefix}\``);
+        message.reply(`Halo! Prefix bot ini sekarang \`${prefix}\`. Coba \`${prefix} help\` untuk lihat fitur.`);
     }
 });
 

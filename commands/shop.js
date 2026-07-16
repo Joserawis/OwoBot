@@ -15,26 +15,39 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setColor(Colors.Gold)
         .setTitle('🛒 Shop')
-        .setDescription('Use `somuy shop <item>` to buy an item.');
+        .setDescription('Use `somuy shop <item|number> <qty>` to buy.');
 
-      items.forEach(item => {
-        embed.addFields({ name: `${item.name}`, value: `${item.description}\nPrice: 💰 ${item.price}`, inline: false });
+      items.forEach((item, index) => {
+        embed.addFields({ name: `${index + 1}. ${item.name}`, value: `${item.description}\nPrice: 💰 ${item.price}`, inline: false });
       });
 
       return message.channel.send({ embeds: [embed] });
     }
 
-    const item = items.find(i => i.id === args[0].toLowerCase());
+    const firstArg = args[0].toLowerCase();
+    const qty = Math.min(5, Math.max(1, parseInt(args[1], 10) || 1));
+
+    let item = items.find(i => i.id === firstArg);
+    if (!item) {
+      const index = parseInt(firstArg, 10);
+      if (!isNaN(index) && index >= 1 && index <= items.length) {
+        item = items[index - 1];
+      }
+    }
+
     if (!item) return message.reply('Item tidak ditemukan.');
 
+    const totalCost = item.price * qty;
     const user = await getOrCreateUser({ userId: message.author.id, username: message.author.username });
-    if (user.balance < item.price) return message.reply('Saldo kamu kurang untuk beli item ini.');
+    if (user.balance < totalCost) return message.reply('Saldo kamu kurang untuk beli item ini.');
 
-    user.balance -= item.price;
+    user.balance -= totalCost;
     user.inventory = user.inventory || { common: [], rare: [] };
-    user.inventory.common.push({ name: item.name });
+    for (let i = 0; i < qty; i += 1) {
+      user.inventory.common.push({ name: item.name });
+    }
     await saveUser(user);
 
-    return message.reply(`Kamu berhasil membeli **${item.name}** untuk 💰 ${item.price}.`);
+    return message.reply(`Kamu berhasil membeli **${qty}x ${item.name}** seharga 💰 ${totalCost}.`);
   }
 };

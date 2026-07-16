@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const User = require('../models/User');
+const { getOrCreateUser, saveUser } = require('../utils/userStore');
 const GIF_LINKS = {
     flipping: 'https://media.tenor.com/UTgK0rCiKLMAAAAi/ultimate-coin-flip-lucky-louie-flip.gif',
     head: 'https://i.imgur.com/hOidl0u.png',
@@ -9,67 +9,55 @@ const GIF_LINKS = {
 module.exports = {
     name: 'coinflip',
     description: 'Bet on a coin flip to win or lose coins',
-    args: true,
-    usage: '<bet-amount> <head/tails>',
     async execute(message, args) {
         const userId = message.author.id;
-        const betAmount = parseInt(args[0], 10);
+        const rawBet = args[0]?.toLowerCase();
         const choice = args[1]?.toLowerCase();
 
-        if (isNaN(betAmount) || betAmount <= 0 || !['head', 'tails'].includes(choice)) {
-            return message.channel.send('Invalid arguments. Use `?coinflip <bet-amount> <head/tails>`');
+        let betAmount = null;
+        let isAll = false;
+
+        if (rawBet === 'all') {
+            isAll = true;
+        } else {
+            betAmount = parseInt(rawBet, 10);
         }
 
-        let user;
-        try {
-            user = await User.findOne({ userId });
-            if (!user) {
-                user = new User({ userId, username: message.author.username });
-            }
-        } catch (error) {
-            console.error('Error fetching user data:', error);
-            return message.channel.send('An error occurred while fetching user data.');
+        if ((isAll ? false : (isNaN(betAmount) || betAmount <= 0)) || !['head', 'tails'].includes(choice)) {
+            return message.channel.send('Invalid arguments. Use `somuy coinflip <bet-amount|all> <head/tails>`');
         }
 
-        if (user.balance < betAmount) {
+        const user = await getOrCreateUser({ userId, username: message.author.username });
+        const availableBalance = user.balance || 0;
+        const maxBet = Math.min(250000, availableBalance);
+        const finalBet = isAll ? maxBet : Math.min(betAmount, maxBet);
+
+        if (finalBet <= 0 || availableBalance < finalBet) {
             return message.channel.send('Insufficient balance for this bet.');
         }
 
-        // Send the flipping embed
         const flippingEmbed = new EmbedBuilder()
             .setColor('#FFFF00')
-            .setDescription('Coin is flipping...')
-            .setThumbnail(GIF_LINKS.flipping) // Use thumbnail for the flipping image
+            .setDescription('Coin is flipping...');
 
         const flippingMessage = await message.channel.send({ embeds: [flippingEmbed] });
 
-        // Remove flipping embed after 5 seconds
         setTimeout(async () => {
             const result = Math.random() < 0.5 ? 'head' : 'tails';
             const win = result === choice;
-            const reward = win ? betAmount * 2 : 0;
+            const reward = win ? finalBet * 2 : 0;
+            user.balance += (win ? reward : -finalBet);
+            await saveUser(user);
 
-            user.balance += (win ? reward : -betAmount);
-
-            try {
-                await user.save();
-            } catch (error) {
-                console.error('Error updating user data:', error);
-                return message.channel.send('An error occurred while updating your balance.');
-            }
-
-            // Update with result
             const resultEmbed = new EmbedBuilder()
                 .setColor(win ? '#00FF00' : '#FF0000')
                 .setTitle(`You ${win ? 'Won' : 'Lost'} The Game!`)
-                .setDescription(`You were ${win ? 'given' : 'fined'}:\n> 💰 ${win ? reward : -betAmount}`)
+                .setDescription(`You were ${win ? 'given' : 'fined'}:\n> 💰 ${win ? reward : -finalBet}`)
                 .setThumbnail(win ? GIF_LINKS.head : GIF_LINKS.tails)
-                .addFields(
-                    { name: 'Balance', value: `💳 ${user.balance}`, inline: true }
-                )
+                .addFields({ name: 'Balance', value: `💳 ${user.balance}`, inline: true })
                 .setTimestamp();
 
             await flippingMessage.edit({ embeds: [resultEmbed] });
-        }, 5000); // 5 seconds delay
+        }, 1500);
     },
 };

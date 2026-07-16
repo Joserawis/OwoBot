@@ -1,44 +1,34 @@
 const { EmbedBuilder, Colors } = require('discord.js');
-const User = require('../models/User'); // Ensure the correct path
+const { getOrCreateUser, saveUser } = require('../utils/userStore');
 
 module.exports = {
     name: 'hunt',
     description: 'Hunt for animals using coins!',
     async execute(message, args) {
-        const userId = message.author.id;
-        const user = await User.findOne({ userId });
+        const user = await getOrCreateUser({ userId: message.author.id, username: message.author.username });
+        const amount = parseInt(args[0], 10) || 100;
 
-        if (!user) {
-            return message.reply('You do not have an account.');
+        if (amount < 100) {
+            return message.reply('Kamu minimal harus mengeluarkan 100 coins untuk hunt.');
         }
 
-        const amount = parseInt(args[0], 10);
-        if (isNaN(amount) || amount < 100) {
-            return message.reply('You must spend at least 100 coins to hunt.');
-        }
-
-        if (user.balance < amount) {
-            return message.reply('You do not have enough coins.');
+        if ((user.balance || 0) < amount) {
+            return message.reply('Saldo kamu kurang untuk hunt.');
         }
 
         user.balance -= amount;
-        await user.save();
-
         const animals = ['Wolf', 'Lion', 'Tiger', 'Bear', 'Eagle', 'Shark'];
-        const numberOfAnimals = Math.floor(Math.random() * 2) + 1; // 1 or 2 animals
-
-        let caughtAnimals = [];
-        for (let i = 0; i < numberOfAnimals; i++) {
-            caughtAnimals.push(animals[Math.floor(Math.random() * animals.length)]);
-        }
+        const numberOfAnimals = Math.floor(Math.random() * 2) + 1;
+        const caughtAnimals = Array.from({ length: numberOfAnimals }, () => animals[Math.floor(Math.random() * animals.length)]);
 
         user.zoo = user.zoo || [];
         user.zoo.push(...caughtAnimals);
-        await user.save();
+        user.xp = (user.xp || 0) + 20;
+        await saveUser(user);
 
         const embed = new EmbedBuilder()
             .setTitle(`${message.author.username} went hunting!`)
-            .setDescription(`You spent ${amount} coins and caught: ${caughtAnimals.join(', ')}`)
+            .setDescription(`Kamu menghabiskan ${amount} coins dan menangkap: ${caughtAnimals.join(', ')}`)
             .setColor(Colors.Green);
 
         message.channel.send({ embeds: [embed] });
