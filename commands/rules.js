@@ -15,7 +15,7 @@ module.exports = {
                 `• You cannot sell/trade money or any bot goods for anything outside of the bot.\n\n` +
                 `• If you have any questions, come ask us in our server!\n\n` +
                 `[Privacy Policy](https://discord.com/privacy) - [Terms of Service](https://discord.com/terms)\n\n` +
-                `Infinity what's this? You already agreed to these rules! <3`
+                `You already agreed to these rules. Please keep the server safe and fair!`
             )
             .setFooter({ text: '10,000 Users agreed' });
 
