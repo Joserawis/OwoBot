@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 const connectDB = require('./db');
+const { getOrCreateUser, saveUser } = require('./utils/userStore');
 const { Client, GatewayIntentBits, Events, Collection, ActivityType } = require('discord.js');
 
 // Create a new client instance
@@ -13,24 +14,7 @@ client.prefix = DEFAULT_PREFIX;
 
 const prefixesPath = path.join(__dirname, 'database/prefixes.json');
 const activeCommandFiles = [
-    'balance',
-    'choose',
-    'coinflip',
-    'define',
-    'duel',
-    'give',
-    'guess',
-    'help',
-    'ping',
-    'prefix',
-    'profile',
-    'roll',
-    'slotbattle',
-    'slots',
-    'translate',
-    'addmoney',
-    'takemoney',
-    'setmoney'
+    'balance','beg','daily','work','bank','deposit','withdraw','give','hunt','level','profile','ping','help','prefix','coinflip','slots','slotbattle','guess','duel','choose','define','roll','translate','ship','addmoney','takemoney','setmoney','shop','class','stats','userinfo','leaderboard'
 ];
 
 // Load the prefixes from file
@@ -72,6 +56,24 @@ client.once(Events.ClientReady, () => {
 // Event: Message is received
 client.on(Events.MessageCreate, async message => {
     if (message.author.bot) return;
+
+    const profileUser = await getOrCreateUser({ userId: message.author.id, username: message.author.username });
+    profileUser.xp = (profileUser.xp || 0) + 5;
+    const xpNeeded = 100 + (profileUser.level - 1) * 25;
+    while (profileUser.xp >= xpNeeded) {
+        profileUser.xp -= xpNeeded;
+        profileUser.level += 1;
+    }
+    await saveUser(profileUser);
+
+    if (message.content && message.content.trim()) {
+        const content = message.content.trim();
+        const mentionRegex = new RegExp(`^<@!?${client.user.id}>`);
+        if (mentionRegex.test(content)) {
+            const prefix = (message.guild?.id && client.prefixes[message.guild.id]) || client.prefix;
+            return message.reply(`Halo! Prefix bot ini sekarang \`${prefix}\`. Coba \`${prefix} help\` untuk lihat fitur.`);
+        }
+    }
 
     const guildId = message.guild?.id;
     const prefix = (guildId && client.prefixes[guildId]) || client.prefix;

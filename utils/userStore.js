@@ -17,6 +17,8 @@ async function getOrCreateUser({ userId, username, userStorePath = defaultStoreP
     balance: 0,
     bankBalance: 0,
     level: 1,
+    xp: 0,
+    class: null,
     marriedTo: null,
     inventory: { common: [], rare: [] },
     zoo: [],

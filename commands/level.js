@@ -1,5 +1,5 @@
 // commands/level.js
-const mongoose = require('mongoose');
+const { EmbedBuilder, Colors } = require('discord.js');
 const User = require('../models/User');
 
 module.exports = {
@@ -7,23 +7,22 @@ module.exports = {
     description: 'Show your chat level',
     async execute(message) {
         const userId = message.author.id;
-
-        // Ensure user is in the database
         let user = await User.findOne({ userId });
+
         if (!user) {
-            user = new User({ userId, username: message.author.username });
-            await user.save();
+            user = await User.create({ userId, username: message.author.username });
         }
 
-        message.channel.send({
-            embeds: [
-                {
-                    title: `${message.author.username}'s Level`,
-                    description: `You are currently at level **${user.level || 1}**.`,
-                    color: 0x00FF00,
-                    thumbnail: { url: message.author.displayAvatarURL() }
-                }
-            ]
-        });
+        const xpNeeded = 100 + (user.level - 1) * 25;
+        const embed = new EmbedBuilder()
+            .setColor(Colors.Green)
+            .setTitle(`${message.author.username}'s Level`)
+            .setDescription(`Level **${user.level || 1}**\nXP **${user.xp || 0} / ${xpNeeded}**`)
+            .addFields(
+                { name: 'Class', value: user.class || 'No class yet', inline: true },
+                { name: 'Balance', value: `💰 ${user.balance || 0}`, inline: true }
+            );
+
+        message.channel.send({ embeds: [embed] });
     }
 };

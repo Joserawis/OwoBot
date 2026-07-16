@@ -14,5 +14,23 @@
     "lastDaily": null,
     "lastWork": null,
     "lastBeg": null
+  },
+  "railway-demo": {
+    "userId": "railway-demo",
+    "username": "Railway",
+    "balance": 500,
+    "bankBalance": 0,
+    "level": 2,
+    "xp": 120,
+    "class": "Fighter",
+    "marriedTo": null,
+    "inventory": {
+      "common": [],
+      "rare": []
+    },
+    "zoo": [],
+    "lastDaily": null,
+    "lastWork": null,
+    "lastBeg": null
   }
 }

@@ -4,7 +4,8 @@ module.exports = {
     name: 'addmoney',
     description: 'Give money to a user (owner only)',
     async execute(message, args) {
-        if (message.author.id !== process.env.OWNER_ID) {
+        const ownerId = process.env.OWNER_ID || message.guild?.ownerId;
+        if (message.author.id !== ownerId) {
             return message.reply('Kamu bukan owner, nggak bisa pakai ini.');
         }
 
